@@ -2,7 +2,7 @@
  * @Author: francesco
  * @Date:   2021-03-20T11:03:05+01:00
  * @Last edit by: francesco
- * @Last edit at: 2021-09-19T19:30:10+02:00
+ * @Last edit at: 2021-09-19T21:41:56+02:00
  */
 
 const express = require("express");
@@ -32,8 +32,19 @@ app.use(bodyParser.text({limit: '5mb'}));
 
 app.post("/:fileName", (req, res) => {
 
-  fs.writeFileSync(__dirname+"/store/"+req.params.fileName+".png", Buffer.from(req.body.slice(23), "base64"));
+  let sl, ext;
+  switch (req.body.substring(0, 22)) {
+    case `data:image/jpeg;base64`:
+      ext = ".jpeg";
+      sl = 23;
+      break;
+    case `data:image/png;base64,`:
+      ext = ".png";
+      sl = 22;
+      break;
+  }
 
+  fs.writeFileSync(__dirname+"/store/"+req.params.fileName+ext, Buffer.from(req.body.slice(sl), "base64"));
   res.status(200).send();
 })
 
